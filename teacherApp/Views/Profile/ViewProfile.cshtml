@@ -1,0 +1,28 @@
+﻿@model socialApp.Models.UserProfile
+
+@if (Model == null)
+{
+    <div class="alert alert-danger">
+        Profile data is not available.
+    </div>
+}
+else
+{
+    <div class="text-center">
+        <h2>Your Profile</h2>
+        <div class="profile-picture">
+            <img src="@Model.ProfilePictureUrl" alt="Profile Picture" class="img-fluid rounded-circle" style="width: 150px; height: 150px;" />
+        </div>
+        <h3>@Model.Name</h3>
+        <p>@Model.Bio</p>
+        <a href="@Url.Action("EditProfile")" class="btn btn-primary">
+            <i class="fa fa-cog"></i> Edit Profile
+        </a>
+    </div>
+}
+
+<script>
+    console.log("Profile Picture URL: '@Model.ProfilePictureUrl'");
+    console.log("Name: '@Model.Name'");
+    console.log("Bio: '@Model.Bio'");
+</script>

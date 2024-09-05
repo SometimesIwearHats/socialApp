@@ -1,0 +1,38 @@
+﻿@page
+@model socialApp.Controllers.HomeController
+
+<div class="welcome-box text-center">
+    <h1 class="display-4">Welcome to socialApp</h1>
+    <p>Manage your students efficiently with our platform.</p>
+
+    <!-- Login/Signup buttons-->
+    <a class="btn btn-primary btn-lg" href="/Auth/SignUp">Sign Up</a>
+    <a class="btn btn-secondary btn-lg" href="/Auth/Login">Login</a>
+</div>
+
+<!-- Style for login/signup box -->
+<style>
+    .welcome-box {
+        max-width: 500px;
+        margin: 50px auto;
+        padding: 30px;
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+        .welcome-box h1 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        .welcome-box p {
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+
+        .welcome-box .btn {
+            width: 100%;
+            margin-top: 10px;
+        }
+</style>

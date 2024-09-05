@@ -1,0 +1,81 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"] - socialApp</title>
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-light bg-light">
+            <a class="navbar-brand" href="/">socialApp</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/Privacy">Privacy</a>
+                    </li>
+                    @{
+                        var userEmail = ViewContext.HttpContext.Session.GetString("UserEmail");
+                    }
+                    @if (string.IsNullOrEmpty(userEmail))
+                    {
+                        // Signup/Login buttons
+                        <li class="nav-item">
+                            <a class="nav-link" href="/Auth/SignUp">Sign Up</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/Auth/Login">Login</a>
+                        </li>
+                    }
+                    else
+                    // Nav when logged in and authenticated
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" href="/Students/Index">Students</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/Students/Create">Add Student</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/Auth/Logout" onclick="document.getElementById('logoutForm').submit(); return false;">Logout</a>
+                            <form id="logoutForm" method="post" action="/Auth/Logout" style="display:none;"></form>
+                        </li>
+                        <li class="nav-item">
+                            <span class="navbar-text">Welcome, @userEmail</span>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/Profile/ViewProfile">Profile</a>
+                        </li>
+
+                    }
+                </ul>
+
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; @DateTime.Now.Year - socialApp - <a href="/Privacy">Privacy</a>
+        </div>
+    </footer>
+
+    @RenderSection("Scripts", required: false)
+</body>
+</html>
