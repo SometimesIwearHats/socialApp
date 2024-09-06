@@ -3,51 +3,29 @@ using Firebase.Auth.Providers;
 using Firebase.Auth.Repository;
 using Firebase.Database;
 using Firebase.Storage;
+using FirebaseAdmin;
 using Newtonsoft.Json;
-using socialApp.Services; // Add this to import the FirebaseAuthService
+using socialApp.Services; // Import the FirebaseAuthService
+using Microsoft.Extensions.Logging;
+using Google.Apis.Auth.OAuth2;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Load Firebase configuration from firebaseConfig.json
-var firebaseConfig = LoadFirebaseConfig();
-Console.WriteLine("API Key: " + firebaseConfig.ApiKey);
-Console.WriteLine("Auth Domain: " + firebaseConfig.AuthDomain);
-
-// Configure FirebaseAuthClient
-var config = new FirebaseAuthConfig
+// Initialize Firebase
+FirebaseApp.Create(new AppOptions()
 {
-    ApiKey = firebaseConfig.ApiKey.ToString(),
-    AuthDomain = firebaseConfig.AuthDomain.ToString(),
-    Providers = new FirebaseAuthProvider[]
-    {
-        new EmailProvider()  // Add and configure providers as needed
-    },
-    UserRepository = new FileUserRepository("FirebaseSample")  // Persistent user credentials storage
-};
+    Credential = GoogleCredential.FromFile("Config/teacherapp-fb004-firebase-adminsdk-i85x3-a4daa34515.json"),
+});
 
-var authClient = new FirebaseAuthClient(config);
+// Register HttpClient
+builder.Services.AddHttpClient(); // Register HttpClient
 
-// Register the FirebaseAuthClient
-builder.Services.AddSingleton(authClient);
-
-// Register FirebaseAuthService for Dependency Injection (DI) and HttpClient
-builder.Services.AddHttpClient<FirebaseAuthService>();
-
-// Initialize Firebase services
-builder.Services.AddSingleton(new FirebaseClient(firebaseConfig.DatabaseURL.ToString()));
-builder.Services.AddSingleton(new FirebaseStorage(firebaseConfig.StorageBucket.ToString()));
+// Register FirebaseAuthService
+builder.Services.AddScoped<FirebaseAuthService>();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-
-// Add session services
-builder.Services.AddDistributedMemoryCache();  // Required for session state
-builder.Services.AddSession(options =>
-{
-    options.IdleTimeout = TimeSpan.FromMinutes(30); // Set session timeout
-    options.Cookie.HttpOnly = true; // Make the session cookie accessible only to the server
-    options.Cookie.IsEssential = true; // Mark the session cookie as essential
-});
+builder.Services.AddSession(); // Add session services
 
 var app = builder.Build();
 
@@ -55,6 +33,7 @@ var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
+    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
@@ -63,42 +42,23 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseSession();  // Add the session middleware
-
 app.UseAuthorization();
+
+app.UseSession(); // Enable session middleware
+
+// Custom routes for logged in teachers to view/add students
+app.MapControllerRoute(
+    name: "allstudents",
+    pattern: "School/AllStudents",
+    defaults: new { controller = "Students", action = "Index" });
+
+app.MapControllerRoute(
+    name: "addstudent",
+    pattern: "School/AddStudent",
+    defaults: new { controller = "Students", action = "Create" });
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
-
-// Method to load Firebase configuration from firebaseConfig.json
-FirebaseConfig LoadFirebaseConfig()
-{
-    // Define the path to the Firebase config file
-    var configFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Config", "firebaseConfig.json");
-
-    // Check if the configuration file exists
-    if (!File.Exists(configFilePath))
-    {
-        throw new FileNotFoundException("Firebase configuration file not found.");
-    }
-
-    // Read the content of the configuration file
-    var configJson = File.ReadAllText(configFilePath);
-
-    // Deserialize the JSON content into the FirebaseConfig class
-    FirebaseConfig config = JsonConvert.DeserializeObject<FirebaseConfig>(configJson);
-
-    // Check if the deserialization was successful and required fields are not null or empty
-    if (config == null || string.IsNullOrEmpty(config.ApiKey) || string.IsNullOrEmpty(config.AuthDomain)
-        || string.IsNullOrEmpty(config.DatabaseURL) || string.IsNullOrEmpty(config.ProjectId)
-        || string.IsNullOrEmpty(config.StorageBucket) || string.IsNullOrEmpty(config.MessagingSenderId)
-        || string.IsNullOrEmpty(config.AppId))
-    {
-        throw new InvalidOperationException("One or more required Firebase configuration fields are missing.");
-    }
-
-    return config;
-}

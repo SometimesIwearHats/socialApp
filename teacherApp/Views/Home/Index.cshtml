@@ -3,11 +3,22 @@
 
 <div class="welcome-box text-center">
     <h1 class="display-4">Welcome to socialApp</h1>
-    <p>Manage your students efficiently with our platform.</p>
-
-    <!-- Login/Signup buttons-->
-    <a class="btn btn-primary btn-lg" href="/Auth/SignUp">Sign Up</a>
-    <a class="btn btn-secondary btn-lg" href="/Auth/Login">Login</a>
+       
+    @{
+        var userEmail = ViewContext.HttpContext.Session.GetString("UserEmail");
+    }
+    @if (string.IsNullOrEmpty(userEmail))
+    {
+        <!-- Display Sign-Up and Login buttons when the user is NOT logged in -->
+        <a class="btn btn-primary btn-lg" href="/Auth/SignUp">Sign Up</a>
+        <a class="btn btn-secondary btn-lg" href="/Auth/Login">Login</a>
+    }
+    else
+    {
+        <!-- Display welcome message or dashboard navigation for logged-in users -->
+        <p>Welcome back, @userEmail!</p>
+        <a class="btn btn-primary btn-lg" href="/Home/Index">Go to Dashboard</a>
+    }
 </div>
 
 <!-- Style for login/signup box -->

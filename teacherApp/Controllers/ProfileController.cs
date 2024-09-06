@@ -24,33 +24,55 @@ namespace socialApp.Controllers
         [HttpGet]
         public async Task<IActionResult> ViewProfile()
         {
-            var userEmail = HttpContext.Session.GetString("UserEmail");
+            var userId = HttpContext.Session.GetString("UserId");  // Fetch UserId from session
+            var userEmail = HttpContext.Session.GetString("UserEmail");  // Fetch Email from session
 
-            // Log userEmail to see if it's being set properly
+            // Log userId and userEmail to see if they're being set properly
+            Console.WriteLine("Session UserId: " + userId);
             Console.WriteLine("Session UserEmail: " + userEmail);
 
-            if (string.IsNullOrEmpty(userEmail))
+            if (string.IsNullOrEmpty(userId) && string.IsNullOrEmpty(userEmail))
             {
-                Console.WriteLine("No user email found in session.");
+                Console.WriteLine("No user ID or email found in session.");
                 return RedirectToAction("Login", "Auth");
             }
 
             try
             {
-                // Fetch user profile from Firebase Realtime Database
-                var userProfile = await _firebaseClient
-                    .Child("UserProfiles")
-                    .OrderBy("Email")
-                    .EqualTo(userEmail)
-                    .OnceSingleAsync<UserProfile>();
+                UserProfile userProfile = null;
 
-                if (userProfile != null)
+                if (!string.IsNullOrEmpty(userId))
                 {
-                    Console.WriteLine("Profile fetched from Firebase. Name: " + userProfile.Name);
+                    // Fetch user profile from Firebase by UserId
+                    userProfile = await _firebaseClient
+                        .Child("UserProfiles")
+                        .Child(userId)
+                        .OnceSingleAsync<UserProfile>();
+
+                    if (userProfile != null)
+                    {
+                        Console.WriteLine("Profile fetched from Firebase by UserId. Name: " + userProfile.Name);
+                    }
                 }
-                else
+
+                if (userProfile == null && !string.IsNullOrEmpty(userEmail))
                 {
-                    Console.WriteLine("No profile found for email: " + userEmail);
+                    // Fetch user profile from Firebase by Email if UserId fetch fails
+                    userProfile = await _firebaseClient
+                        .Child("UserProfiles")
+                        .OrderBy("Email")
+                        .EqualTo(userEmail)
+                        .OnceSingleAsync<UserProfile>();
+
+                    if (userProfile != null)
+                    {
+                        Console.WriteLine("Profile fetched from Firebase by Email. Name: " + userProfile.Name);
+                    }
+                }
+
+                if (userProfile == null)
+                {
+                    Console.WriteLine("No profile found for user.");
                     return RedirectToAction("EditProfile");
                 }
 
@@ -62,6 +84,7 @@ namespace socialApp.Controllers
                 return RedirectToAction("Login", "Auth");
             }
         }
+
 
 
 

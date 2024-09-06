@@ -4,10 +4,14 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewData["Title"] - socialApp</title>
-    <link rel="stylesheet" href="~/css/site.css" />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- jQuery Validation -->
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
 </head>
 <body>
     <header>
@@ -17,7 +21,7 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ml-auto">
+                <ul class="navbar-nav">
                     <li class="nav-item">
                         <a class="nav-link" href="/">Home</a>
                     </li>
@@ -27,9 +31,22 @@
                     @{
                         var userEmail = ViewContext.HttpContext.Session.GetString("UserEmail");
                     }
+                    @if (!string.IsNullOrEmpty(userEmail))
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" href="/Students/Index">Friends</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/Students/Create">Inbox</a>
+                        </li>
+                    }
+                </ul>
+
+                <!-- Use 'ml-auto' for right alignment -->
+                <ul class="navbar-nav ms-auto">
                     @if (string.IsNullOrEmpty(userEmail))
                     {
-                        // Signup/Login buttons
+                        <!-- Show Sign Up and Login buttons if not logged in -->
                         <li class="nav-item">
                             <a class="nav-link" href="/Auth/SignUp">Sign Up</a>
                         </li>
@@ -38,28 +55,20 @@
                         </li>
                     }
                     else
-                    // Nav when logged in and authenticated
                     {
-                        <li class="nav-item">
-                            <a class="nav-link" href="/Students/Index">Students</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/Students/Create">Add Student</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/Auth/Logout" onclick="document.getElementById('logoutForm').submit(); return false;">Logout</a>
-                            <form id="logoutForm" method="post" action="/Auth/Logout" style="display:none;"></form>
-                        </li>
+                        <!-- Show Profile and Logout when user is logged in -->
                         <li class="nav-item">
                             <span class="navbar-text">Welcome, @userEmail</span>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="/Profile/ViewProfile">Profile</a>
                         </li>
-
+                        <li class="nav-item">
+                            <a class="nav-link" href="/Auth/Logout" onclick="document.getElementById('logoutForm').submit(); return false;">Logout</a>
+                            <form id="logoutForm" method="post" action="/Auth/Logout" style="display:none;"></form>
+                        </li>
                     }
                 </ul>
-
             </div>
         </nav>
     </header>
