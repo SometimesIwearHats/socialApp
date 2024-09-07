@@ -21,6 +21,7 @@ namespace socialApp.Controllers
             _authService = authService;
         }
 
+        // View Profile
         [HttpGet]
         public async Task<IActionResult> ViewProfile()
         {
@@ -85,10 +86,7 @@ namespace socialApp.Controllers
             }
         }
 
-
-
-
-
+        // Edit Profile
         [HttpGet]
         public async Task<IActionResult> EditProfile()
         {
@@ -114,6 +112,7 @@ namespace socialApp.Controllers
             return View(userProfile);
         }
 
+        // Edit Profile
         [HttpPost]
         public async Task<IActionResult> EditProfile(UserProfile model, IFormFile profilePicture)
         {

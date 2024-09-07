@@ -1,49 +1,54 @@
 ﻿@page
 @model socialApp.Controllers.HomeController
 
-<div class="welcome-box text-center">
-    <h1 class="display-4">Welcome to socialApp</h1>
-       
-    @{
-        var userEmail = ViewContext.HttpContext.Session.GetString("UserEmail");
-    }
-    @if (string.IsNullOrEmpty(userEmail))
-    {
-        <!-- Display Sign-Up and Login buttons when the user is NOT logged in -->
-        <a class="btn btn-primary btn-lg" href="/Auth/SignUp">Sign Up</a>
-        <a class="btn btn-secondary btn-lg" href="/Auth/Login">Login</a>
-    }
-    else
-    {
-        <!-- Display welcome message or dashboard navigation for logged-in users -->
-        <p>Welcome back, @userEmail!</p>
-        <a class="btn btn-primary btn-lg" href="/Home/Index">Go to Dashboard</a>
-    }
+@{
+    var userEmail = ViewContext.HttpContext.Session.GetString("UserEmail");
+}
+
+<!-- Banner below the nav -->
+<div class="banner-container">
+    <div class="banner-content">
+        <h4 class="text-center">Welcome back, @userEmail!</h4>
+    </div>
 </div>
 
-<!-- Style for login/signup box -->
-<style>
-    .welcome-box {
-        max-width: 500px;
-        margin: 50px auto;
-        padding: 30px;
-        background-color: #f8f9fa;
-        border-radius: 10px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
+@if (!string.IsNullOrEmpty(userEmail))
+{
+    <div class="row mt-4">
+        <!-- Left Side Panel for Recent News -->
+        <div class="col-md-3 bg-purple p-4 rounded-left">
+            <h4>Recent News</h4>
+            <ul class="list-unstyled">
+                <li><a href="#">News Item 1</a></li>
+                <li><a href="#">News Item 2</a></li>
+                <li><a href="#">News Item 3</a></li>
+            </ul>
+        </div>
 
-        .welcome-box h1 {
-            font-size: 2rem;
-            margin-bottom: 20px;
-        }
+        <!-- Main Content -->
+        <div class="col-md-6 text-center bg-light-pink p-4">
+            <h5>News Feed</h5>
+            
+        </div>
 
-        .welcome-box p {
-            margin-bottom: 20px;
-            font-size: 1.1rem;
-        }
-
-        .welcome-box .btn {
-            width: 100%;
-            margin-top: 10px;
-        }
-</style>
+        <!-- Right Side Panel for Trending Hashtags -->
+        <div class="col-md-3 bg-purple p-4 rounded-right">
+            <h4>Trending Hashtags</h4>
+            <ul class="list-unstyled">
+                <li><a href="#">#Trending1</a></li>
+                <li><a href="#">#Trending2</a></li>
+                <li><a href="#">#Trending3</a></li>
+            </ul>
+        </div>
+    </div>
+}
+else
+{
+    <!-- Content for non-logged-in users -->
+    <div class="text-center">
+        <h2>SocialApp</h2>
+        <p>Make new friends and organize events together with our SocialApp!</p>
+        <a href="/Auth/Login" class="btn btn-primary">Login</a>
+        <a href="/Auth/SignUp" class="btn btn-secondary">Sign Up</a>
+    </div>
+}

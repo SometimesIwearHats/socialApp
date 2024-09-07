@@ -67,6 +67,7 @@ namespace socialApp.Controllers
                 if (result != null)
                 {
                     HttpContext.Session.SetString("UserEmail", model.Email);
+
                     return RedirectToAction("Index", "Home");
                 }
                 else
