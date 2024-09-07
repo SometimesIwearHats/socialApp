@@ -1,17 +1,16 @@
 ﻿namespace socialApp.Services
 {
-    using Microsoft.AspNetCore.Mvc;
-    using socialApp.Models;
     using System.Net.Http;
     using System.Text;
     using System.Text.Json;
+    using System.Text.Json.Serialization;
     using System.Threading.Tasks;
 
     public class FirebaseAuthService
     {
         private readonly HttpClient _httpClient;
 
-        //Firebase API key
+        // Firebase API key
         private readonly string _apiKey = "AIzaSyBYtyQOtUYwSxz8CV5XMzDqvK_-inmCOCM";
 
         public FirebaseAuthService(HttpClient httpClient)
@@ -19,7 +18,29 @@
             _httpClient = httpClient;
         }
 
-        public async Task<string> SignUpWithEmailPasswordAsync(string email, string password)
+        // Model to capture Firebase authentication response
+        public class FirebaseAuthResponse
+        {
+            [JsonPropertyName("idToken")]
+            public string IdToken { get; set; }
+
+            [JsonPropertyName("email")]
+            public string Email { get; set; }
+
+            [JsonPropertyName("refreshToken")]
+            public string RefreshToken { get; set; }
+
+            [JsonPropertyName("expiresIn")]
+            public string ExpiresIn { get; set; }
+
+            [JsonPropertyName("localId")]
+            public string LocalId { get; set; }
+        }
+
+
+        // SIGN UP
+        // Make this method public so it can be accessed in AuthController
+        public async Task<FirebaseAuthResponse> SignUpWithEmailPasswordAsync(string email, string password)
         {
             var requestBody = new
             {
@@ -34,16 +55,26 @@
             );
 
             var responseContent = await response.Content.ReadAsStringAsync();
+            Console.WriteLine("Firebase Response: " + responseContent);
+
             if (response.IsSuccessStatusCode)
             {
-                // Handle the successful sign-up
-                return responseContent;
+                var result = JsonSerializer.Deserialize<FirebaseAuthResponse>(responseContent);
+                // Add this check for null values
+                if (result == null || string.IsNullOrEmpty(result.Email) || string.IsNullOrEmpty(result.LocalId))
+                {
+                    throw new Exception("Firebase returned an invalid or incomplete response.");
+                }
+
+                return result;  // Return deserialized response
             }
 
             throw new Exception($"SignUp failed: {responseContent}");
         }
 
-        public async Task<string> SignInWithEmailPasswordAsync(string email, string password)
+        // -----------------------------------------------SIGN IN----------------------------------------
+        // Make this method public so it can be accessed in AuthController
+        public async Task<FirebaseAuthResponse> SignInWithEmailPasswordAsync(string email, string password)
         {
             var requestBody = new
             {
@@ -58,9 +89,24 @@
             );
 
             var responseContent = await response.Content.ReadAsStringAsync();
+            Console.WriteLine("Firebase Response: " + responseContent);
+
             if (response.IsSuccessStatusCode)
             {
-                return responseContent;
+                // Deserialize the response to capture user details
+                var result = JsonSerializer.Deserialize<FirebaseAuthResponse>(responseContent);
+
+                // Add this check for null values
+                if (result == null || string.IsNullOrEmpty(result.Email) || string.IsNullOrEmpty(result.LocalId))
+                {
+                    Console.WriteLine("Firebase response has missing fields.");
+                    throw new Exception("Firebase returned an invalid or incomplete response.");
+                }
+
+                // Print individual fields to verify
+                Console.WriteLine($"Firebase Email: {result?.Email}");
+                Console.WriteLine($"Firebase LocalId: {result?.LocalId}");
+                return result;  // Return deserialized response
             }
 
             throw new Exception($"SignIn failed: {responseContent}");

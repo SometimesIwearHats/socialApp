@@ -63,13 +63,18 @@ namespace socialApp.Controllers
             {
                 var result = await _authService.SignInWithEmailPasswordAsync(model.Email, model.Password);
 
-                // If login is successful, store the user's email in session
+                // If login is successful, store the user's email and UserId in session
                 if (result != null)
                 {
-                    HttpContext.Session.SetString("UserEmail", model.Email);
+                    HttpContext.Session.SetString("UserEmail", result.Email);   // Use Email from result
+                    HttpContext.Session.SetString("UserId", result.LocalId);    // Use LocalId from result
+
+                    Console.WriteLine($"Session UserId set: {result.LocalId}");
+                    Console.WriteLine($"Session UserEmail set: {result.Email}");
 
                     return RedirectToAction("Index", "Home");
                 }
+
                 else
                 {
                     model.ErrorMessage = "Invalid login attempt.";
