@@ -1,0 +1,27 @@
+﻿@model IEnumerable<socialApp.Models.Post>
+
+<h2>News Feed</h2>
+
+@foreach (var post in Model)
+{
+    <div class="post">
+        <h4>@post.UserName</h4>
+        <p>@post.Content</p>
+        @if (!string.IsNullOrEmpty(post.ImageUrl))
+        {
+            <img src="@post.ImageUrl" alt="Post Image" style="max-width: 100%; height: auto;" />
+        }
+        <p><small>@post.Timestamp.ToString("g")</small></p>
+        <button>Like (@post.Likes)</button>
+        <h5>Comments</h5>
+        @foreach (var comment in post.Comments)
+        {
+            <p>@comment.UserName: @comment.Content</p>
+        }
+        <form method="post" asp-action="AddComment">
+            <input type="hidden" name="PostId" value="@post.PostId" />
+            <textarea name="CommentContent"></textarea>
+            <button type="submit">Add Comment</button>
+        </form>
+    </div>
+}

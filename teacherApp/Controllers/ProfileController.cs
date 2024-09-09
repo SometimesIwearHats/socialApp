@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Firebase.Database.Query;
 using socialApp.Services;
 using System;
+using System.Text.Json;
 
 namespace socialApp.Controllers
 {
@@ -17,67 +18,74 @@ namespace socialApp.Controllers
 
         public ProfileController(FirebaseAuthService authService)
         {
+            // Realtime Database URL
             _firebaseClient = new FirebaseClient("https://teacherapp-fb004-default-rtdb.firebaseio.com/");
             _authService = authService;
         }
 
-        // View Profile
+        // ------------------------------Save User Profile After Sign-Up------------------------------------
+        public async Task SaveUserProfile(string userId, string email)
+        {
+            var userProfile = new UserProfile
+            {
+                UserId = userId,
+                Email = email,
+                Name = "Default Name", // Set a default name that the user can update later
+                Bio = "Default Bio", // Set a default bio that the user can update later
+                ProfilePictureUrl = "" // Let the user upload a profile picture later
+            };
+
+            try
+            {
+                await _firebaseClient
+                    .Child("UserProfiles")
+                    .Child(userId)
+                    .PutAsync(userProfile);
+
+                Console.WriteLine("User profile created successfully.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error saving user profile: {ex.Message}");
+            }
+        }
+
+        // ------------------------------View Profile------------------------------------
         [HttpGet]
         public async Task<IActionResult> ViewProfile()
         {
-            var userId = HttpContext.Session.GetString("UserId");  // Fetch UserId from session
-            var userEmail = HttpContext.Session.GetString("UserEmail");  // Fetch Email from session
+            var userEmail = HttpContext.Session.GetString("UserEmail");
 
-            // Log userId and userEmail to see if they're being set properly
-            Console.WriteLine("Session UserId: " + userId);
             Console.WriteLine("Session UserEmail: " + userEmail);
 
-            if (string.IsNullOrEmpty(userId) && string.IsNullOrEmpty(userEmail))
+            if (string.IsNullOrEmpty(userEmail))
             {
-                Console.WriteLine("No user ID or email found in session.");
+                Console.WriteLine("No user email found in session.");
                 return RedirectToAction("Login", "Auth");
             }
 
             try
             {
-                UserProfile userProfile = null;
+                // Fetch user profile using Email
+                var result = await _firebaseClient
+                    .Child("UserProfiles")
+                    .OrderBy("Email")
+                    .EqualTo(userEmail)
+                    .OnceSingleAsync<UserProfile>();
 
-                if (!string.IsNullOrEmpty(userId))
+                if (result != null)
                 {
-                    // Fetch user profile from Firebase by UserId
-                    userProfile = await _firebaseClient
-                        .Child("UserProfiles")
-                        .Child(userId)
-                        .OnceSingleAsync<UserProfile>();
+                    Console.WriteLine($"Profile fetched from Firebase by Email. Name: {result.Name}, Bio: {result.Bio}, ProfilePictureUrl: {result.ProfilePictureUrl}");
 
-                    if (userProfile != null)
-                    {
-                        Console.WriteLine("Profile fetched from Firebase by UserId. Name: " + userProfile.Name);
-                    }
+                    // Set UserId in session to ensure consistency
+                    HttpContext.Session.SetString("UserId", result.UserId);
+                    return View(result);
                 }
-
-                if (userProfile == null && !string.IsNullOrEmpty(userEmail))
+                else
                 {
-                    // Fetch user profile from Firebase by Email if UserId fetch fails
-                    userProfile = await _firebaseClient
-                        .Child("UserProfiles")
-                        .OrderBy("Email")
-                        .EqualTo(userEmail)
-                        .OnceSingleAsync<UserProfile>();
-
-                    if (userProfile != null)
-                    {
-                        Console.WriteLine("Profile fetched from Firebase by Email. Name: " + userProfile.Name);
-                    }
+                    Console.WriteLine("No profile found for this user.");
+                    return RedirectToAction("EditProfile"); // Redirect to EditProfile if no profile found
                 }
-
-                if (userProfile == null)
-                {
-                    Console.WriteLine("No profile found for user.");
-                    return RedirectToAction("EditProfile");
-                }
-
-                return View(userProfile);
             }
             catch (Exception ex)
             {
@@ -85,6 +93,7 @@ namespace socialApp.Controllers
                 return RedirectToAction("Login", "Auth");
             }
         }
+
 
         // Edit Profile
         [HttpGet]
@@ -112,77 +121,83 @@ namespace socialApp.Controllers
             return View(userProfile);
         }
 
-        // Edit Profile
+        // Update Profile
         [HttpPost]
         public async Task<IActionResult> EditProfile(UserProfile model, IFormFile profilePicture)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                var userEmail = HttpContext.Session.GetString("UserEmail");
-                if (string.IsNullOrEmpty(userEmail))
+                // Log any validation errors
+                foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
                 {
-                    return RedirectToAction("Login", "Auth");
+                    Console.WriteLine($"Validation error: {error.ErrorMessage}");
                 }
 
-                model.Email = userEmail;
-
-                // Fetch the existing user profile using Email or UserId
-                var existingUserProfile = await _firebaseClient
-                    .Child("UserProfiles")
-                    .OrderBy("Email")
-                    .EqualTo(userEmail)
-                    .OnceSingleAsync<UserProfile>();
-
-                if (existingUserProfile == null)
-                {
-                    // If no profile exists, create a new UserId
-                    model.UserId = Guid.NewGuid().ToString(); // Generate a new UserId
-                }
-                else
-                {
-                    // Keep existing UserId to ensure we're updating the correct profile
-                    model.UserId = existingUserProfile.UserId;
-                }
-
-                // Upload profile picture to Firebase Storage (if any)
-                if (profilePicture != null)
-                {
-                    var stream = profilePicture.OpenReadStream();
-
-                    // Generate a unique filename using UserId
-                    var uniqueFileName = $"{model.UserId}_{DateTime.Now.Ticks}_{profilePicture.FileName}";
-
-                    // Upload the file to Firebase Storage
-                    var task = new FirebaseStorage("teacherapp-fb004.appspot.com")
-                        .Child("profile_pictures")
-                        .Child(uniqueFileName)
-                        .PutAsync(stream);
-
-                    // Await the task and get the download URL
-                    model.ProfilePictureUrl = await task;
-
-                    // Log the URL for debugging purposes
-                    Console.WriteLine("Profile picture URL: " + model.ProfilePictureUrl);
-                }
-                else if (existingUserProfile != null)
-                {
-                    // Keep the old profile picture URL if no new one is uploaded
-                    model.ProfilePictureUrl = existingUserProfile.ProfilePictureUrl;
-                }
-
-                // Update user profile in Firebase Realtime Database
-                await _firebaseClient
-                    .Child("UserProfiles")
-                    .Child(model.UserId) // Update the existing profile by using UserId
-                    .PutAsync(model);
-
-                // Log the update for verification
-                Console.WriteLine("Profile updated for user: " + model.UserId);
-
-                return RedirectToAction("ViewProfile");
+                return View(model); // Return the view if validation fails
             }
 
-            return View(model);
+            var userEmail = HttpContext.Session.GetString("UserEmail");
+            if (string.IsNullOrEmpty(userEmail))
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+
+            model.Email = userEmail;
+
+            // Fetch the existing user profile using Email or UserId
+            var existingUserProfile = await _firebaseClient
+                .Child("UserProfiles")
+                .OrderBy("Email")
+                .EqualTo(userEmail)
+                .OnceSingleAsync<UserProfile>();
+
+            if (existingUserProfile == null)
+            {
+                // If no profile exists, create a new UserId
+                model.UserId = Guid.NewGuid().ToString(); // Generate a new UserId
+            }
+            else
+            {
+                // Keep existing UserId to ensure we're updating the correct profile
+                model.UserId = existingUserProfile.UserId;
+            }
+
+            // Upload profile picture to Firebase Storage (if any)
+            if (profilePicture != null)
+            {
+                var stream = profilePicture.OpenReadStream();
+
+                // Generate a unique filename using UserId
+                var uniqueFileName = $"{model.UserId}_{DateTime.Now.Ticks}_{profilePicture.FileName}";
+
+                // Upload the file to Firebase Storage
+                var task = new FirebaseStorage("teacherapp-fb004.appspot.com")
+                    .Child("profile_pictures")
+                    .Child(uniqueFileName)
+                    .PutAsync(stream);
+
+                // Await the task and get the download URL
+                model.ProfilePictureUrl = await task;
+
+                // Log the URL for debugging purposes
+                Console.WriteLine($"Profile picture URL: {model.ProfilePictureUrl}");
+            }
+            else if (existingUserProfile != null)
+            {
+                // Keep the old profile picture URL if no new one is uploaded
+                model.ProfilePictureUrl = existingUserProfile.ProfilePictureUrl;
+            }
+
+            // Update user profile in Firebase Realtime Database
+            await _firebaseClient
+                .Child("UserProfiles")
+                .Child(model.UserId) // Update the existing profile by using UserId
+                .PutAsync(model);
+
+            // Log the update for verification
+            Console.WriteLine($"Profile updated for user: {model.UserId}");
+
+            return RedirectToAction("ViewProfile");
         }
     }
 }

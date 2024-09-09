@@ -1,0 +1,17 @@
+﻿@{
+    ViewData["Title"] = "Create Post";
+}
+
+<h2>Create a new Post</h2>
+
+<form asp-action="Create" method="post" enctype="multipart/form-data">
+    <div class="form-group">
+        <label for="Content">Content</label>
+        <textarea class="form-control" id="Content" name="Content"></textarea>
+    </div>
+    <div class="form-group">
+        <label for="Image">Upload Image</label>
+        <input type="file" class="form-control-file" id="Image" name="Image" />
+    </div>
+    <button type="submit" class="btn btn-primary">Create Post</button>
+</form>

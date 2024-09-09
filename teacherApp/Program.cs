@@ -17,6 +17,10 @@ FirebaseApp.Create(new AppOptions()
     Credential = GoogleCredential.FromFile("Config/teacherapp-fb004-firebase-adminsdk-i85x3-a4daa34515.json"),
 });
 
+// Firebase config binding
+builder.Services.Configure<FirebaseConfig>(builder.Configuration.GetSection("FirebaseConfig"));
+
+
 // Register HttpClient
 builder.Services.AddHttpClient(); // Register HttpClient
 

@@ -1,5 +1,6 @@
 ﻿namespace socialApp.Services
 {
+    using Microsoft.Extensions.Options;
     using System.Net.Http;
     using System.Text;
     using System.Text.Json;
@@ -9,13 +10,16 @@
     public class FirebaseAuthService
     {
         private readonly HttpClient _httpClient;
+        private readonly string _apiKey;
+        private readonly string _databaseUrl;
+        private readonly string _storageBucket;
 
-        // Firebase API key
-        private readonly string _apiKey = "AIzaSyBYtyQOtUYwSxz8CV5XMzDqvK_-inmCOCM";
-
-        public FirebaseAuthService(HttpClient httpClient)
+        public FirebaseAuthService(HttpClient httpClient, IOptions<FirebaseConfig> firebaseConfig)
         {
             _httpClient = httpClient;
+            _apiKey = firebaseConfig.Value.ApiKey;
+            _databaseUrl = firebaseConfig.Value.DatabaseURL;
+            _storageBucket = firebaseConfig.Value.StorageBucket;
         }
 
         // Model to capture Firebase authentication response
