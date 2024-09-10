@@ -5,7 +5,7 @@ using Firebase.Database;
 using Firebase.Storage;
 using FirebaseAdmin;
 using Newtonsoft.Json;
-using socialApp.Services; // Import the FirebaseAuthService
+using socialApp.Services;
 using Microsoft.Extensions.Logging;
 using Google.Apis.Auth.OAuth2;
 
@@ -50,7 +50,7 @@ app.UseAuthorization();
 
 app.UseSession(); // Enable session middleware
 
-// Custom routes for logged in teachers to view/add students
+
 app.MapControllerRoute(
     name: "allstudents",
     pattern: "School/AllStudents",
