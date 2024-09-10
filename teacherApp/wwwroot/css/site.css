@@ -1,7 +1,9 @@
+/* Global styling */
 html {
     font-size: 14px;
     position: relative;
     min-height: 100%;
+    background-color: #f0f4f8; 
 }
 
 @media (min-width: 768px) {
@@ -10,168 +12,217 @@ html {
     }
 }
 
+/* Button focus styling*/
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+    box-shadow: 0 0 0 0.1rem rgba(38, 198, 218, 0.25), 0 0 0 0.25rem #26c6da; 
 }
 
 body {
     margin-bottom: 60px;
-    background-color: #f5f7fa; /* Light background for the entire app */
-    padding: 20px; /* Padding around the content to make it look more spaced out */
+    background-color: #e3f2fd;
+    padding: 20px;
+    font-family: 'Arial', sans-serif;
 }
 
-/*----- Navbar styling -----*/
-
+/*----- Navbar Styling -----*/
 .navbar {
     padding: 15px 20px;
+    background-color: #4fc3f7; 
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .navbar-nav .nav-link {
-    position: relative;
     padding: 10px 15px;
-    transition: all 0.3s ease;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
     .navbar-nav .nav-link:hover {
-        background-color: #f8f9fa;
+        background-color: #81d4fa; 
         border-radius: 20px;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
     }
 
-
-
-/* Banner styling */
-.banner {
-    background: linear-gradient(1deg, #d1c4e9, #ffe4e1);
-    padding: 20px;
-    border-radius: 10px;
-    margin: 0 auto 20px auto;
-    width: calc(100% - 40px);
-    color: white;
-    text-align: center;
-    color: #555;
-}
+/*----- Banner Styling -----*/
 .banner-container {
     display: flex;
     justify-content: center;
     align-items: center;
     padding: 20px;
-    margin-bottom: 0;
-    background: linear-gradient(1deg, #d1c4e9, #ffe4e1); /* Light pink gradient */
+    margin-bottom: 20px;
+    background-color: rgba(38, 198, 218, 0.25); 
     border-radius: 10px;
-    width: 100%;
-    box-sizing: border-box;
-}
-.banner-content {
-    max-width: 1100px;
-    text-align: center;
-    color: black;
-    font-size: 24px;
-    font-weight: bold;
-    color: #555;
+    color: #333;
 }
 
-/* Custom styles for purple and pink gradient panels */
+.banner-content {
+    text-align: center;
+    font-size: 26px;
+    font-weight: bold;
+}
+
+/*----- Card/Panel Styling -----*/
 .bg-purple {
-    background: linear-gradient(1deg, #d1c4e9, #e1bee7); /* Light purple gradient */
+    background-color: #bbdefb;
     color: white;
-    border: 1px solid #dcdcdc;
     border-radius: 10px;
     padding: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     margin-bottom: 20px;
 }
 
 .bg-light-pink {
-    background: linear-gradient(1deg, #d1c4e9, #ffe4e1); /* Light pink gradient */
-    color: #555;
+    background-color: #e1f5fe;
+    color: #333;
     border-radius: 10px;
-    border: 1px solid #dcdcdc;
     padding: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     margin-bottom: 20px;
 }
 
-.rounded-left {
-    border-radius: 10px 0 0 10px;
+/*----- Post Layout Styling -----*/
+.card {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: left;
+    max-width: 100%; 
+    overflow: hidden;
 }
 
-.rounded-right {
-    border-radius: 0 10px 10px 0;
+.card-body p {
+    color: #444;
+    font-size: 1rem;
 }
 
-/* Styling for links */
+.card .btn-primary {
+    background-color: #0288d1;
+    border: none;
+    font-size: 0.9rem;
+    padding: 5px 10px;
+    border-radius: 20px;
+}
+
+.card .btn-secondary {
+    background-color: #26a69a; 
+    border: none;
+    font-size: 0.9rem;
+    padding: 5px 10px;
+    border-radius: 20px;
+}
+
+textarea {
+    width: 100%;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    margin-bottom: 10px;
+    font-size: 0.9rem;
+}
+
+/* Sidebar Styling */
+.col-md-3.bg-purple {
+    background-color: #b3e5fc;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    border-radius: 10px;
+}
+
+    .col-md-3.bg-purple h4, .col-md-6.bg-light-pink h4 {
+        color: #444;
+        font-weight: bold;
+    }
+
+/* Link Styling */
 a {
-    color: #007bff;
+    color: #0288d1; 
     text-decoration: none;
+    transition: color 0.3s ease;
 }
 
     a:hover {
-        color: #0056b3;
-        text-decoration: underline;
+        color: #01579b;
     }
 
-/* Padding and spacing for list items */
-ul.list-unstyled {
-    padding-left: 0;
-    margin-top: 20px;
+/* Footer Styling */
+footer {
+    background-color: #f8f9fa;
+    padding: 15px 0;
+    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
 }
 
-/* Styling for paragraphs */
-p {
-    font-size: 1.1rem;
-    color: #555;
+/* Styling for post images */
+.post-image {
+    width: 100%; 
+    height: auto; 
+    max-width: 500px; 
+    max-height: 300px; 
+    object-fit: cover; 
+    border-radius: 10px; 
+    display: block;
+    margin: 0 auto; /* Centers the image */
 }
 
-/* Centered login box */
-.login-container {
-    max-width: 400px;
-    margin: 50px auto; /* Center horizontally */
+/* Timestamp styling */
+.timestamp-text {
+    font-size: 0.9rem;
+    color: #888;
+}
+
+/* Sidebar Styling (For both Recent News and Trending Hashtags) */
+.sidebar {
+    background-color: #e3f2fd; 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     padding: 20px;
-    background-color: #fff; /* White background */
-    border-radius: 10px; /* Rounded corners */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-    border: 1px solid #ddd; /* Light border */
+    border-radius: 10px;
+    margin-bottom: 20px;
 }
 
-    .login-container h2 {
-        text-align: center;
+    .sidebar h4 {
+        color: #444;
+        font-weight: bold;
+        font-family: Arial, sans-serif; 
+    }
+
+/* Main Content (News Feed) */
+.feed {
+    background-color: #ffffff;
+    color: #333;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+/* Styling for login form box */
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    background-color: #f0f4f8; 
+}
+
+.login-box {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    max-width: 400px;
+    width: 100%;
+}
+
+    .login-box h2 {
+        margin-bottom: 20px;
+        font-size: 1.5rem;
+        color: #333;
+    }
+
+    .login-box .form-control {
         margin-bottom: 20px;
     }
 
-    .login-container .form-group {
-        margin-bottom: 15px;
+    .login-box .btn {
+        width: 100%;
     }
-
-    .login-container .btn-primary {
-        width: 100%; /* Full width button */
-        padding: 10px;
-        border-radius: 5px;
-    }
-
-/* Panel styling for Recent News and Trending Hashtags */
-.col-md-3.bg-light {
-    background-color: #d1c4e9; /* Light purple for the panels */
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Light shadow */
-    border-radius: 10px; /* Rounded corners */
-    padding: 20px;
-    margin-bottom: 20px;
-}
-
-/* Main content panel styling */
-.col-md-6.bg-light {
-    background-color: #d1c4e9; /* Light purple for the main panel */
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Light shadow */
-    border-radius: 10px; /* Rounded corners */
-    padding: 20px;
-    margin-bottom: 20px;
-}
-/* Styling for panel headers */
-.col-md-3.bg-light h4 {
-    color: #555; /* Same color as the main section */
-    font-weight: bold;
-}
-
-/* Ensure consistent color for other headers like Recent News */
-.col-md-6.bg-light h4 {
-    color: #555; /* Same color as the main section */
-    font-weight: bold;
-}

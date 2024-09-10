@@ -113,9 +113,9 @@ namespace socialApp.Controllers
             {
                 UserId = userId,
                 Email = email,
-                Name = "Default Name",  // Placeholder, can be updated later
-                Bio = "Default Bio",    // Placeholder, can be updated later
-                ProfilePictureUrl = ""  // Placeholder, can be updated later
+                Name = "Default Name",  
+                Bio = "Default Bio",    
+                ProfilePictureUrl = ""  
             };
 
             // Save the user profile to Firebase Realtime Database

@@ -30,9 +30,9 @@ namespace socialApp.Controllers
             {
                 UserId = userId,
                 Email = email,
-                Name = "Default Name", // Set a default name that the user can update later
-                Bio = "Default Bio", // Set a default bio that the user can update later
-                ProfilePictureUrl = "" // Let the user upload a profile picture later
+                Name = "Default Name", 
+                Bio = "Default Bio",
+                ProfilePictureUrl = "" 
             };
 
             try
@@ -84,7 +84,7 @@ namespace socialApp.Controllers
                 else
                 {
                     Console.WriteLine("No profile found for this user.");
-                    return RedirectToAction("EditProfile"); // Redirect to EditProfile if no profile found
+                    return RedirectToAction("EditProfile"); // Redirect to EditProfile if no profile is found
                 }
             }
             catch (Exception ex)
@@ -179,7 +179,7 @@ namespace socialApp.Controllers
                 // Await the task and get the download URL
                 model.ProfilePictureUrl = await task;
 
-                // Log the URL for debugging purposes
+                // Log the URL for debugging
                 Console.WriteLine($"Profile picture URL: {model.ProfilePictureUrl}");
             }
             else if (existingUserProfile != null)

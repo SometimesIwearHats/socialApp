@@ -11,9 +11,15 @@ namespace socialApp.Models
         public string Content { get; set; }
         public string ImageUrl { get; set; }
         public DateTime Timestamp { get; set; } = DateTime.UtcNow;
-        public int Likes { get; set; } = 0;
+
+        public List<string> LikesList { get; set; } = new List<string>(); // Track users who liked
+        public int Likes => LikesList.Count; // Compute Likes based on the list size
+
         public List<Comment> Comments { get; set; } = new List<Comment>();
     }
+
+
+
 
     public class Comment
     {

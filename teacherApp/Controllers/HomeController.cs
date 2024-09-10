@@ -1,32 +1,34 @@
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
+using Firebase.Database;
+using System.Threading.Tasks;
 using socialApp.Models;
+using System.Linq;
+using Firebase.Database.Query;
 
 namespace socialApp.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly FirebaseClient _firebaseClient;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController()
         {
-            _logger = logger;
+            _firebaseClient = new FirebaseClient("https://teacherapp-fb004-default-rtdb.firebaseio.com/");
         }
 
-        public IActionResult Index()
+        [HttpGet]
+        public async Task<IActionResult> Index()
         {
-            return View();
+            // Fetch posts from Firebase
+            var posts = await _firebaseClient
+                .Child("Posts")
+                .OrderBy("Timestamp")
+                .OnceAsync<Post>();
+
+            var postsList = posts.Select(p => p.Object).OrderByDescending(p => p.Timestamp).ToList();
+
+            return View(postsList); // Pass the list of posts to the view
         }
 
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
     }
 }

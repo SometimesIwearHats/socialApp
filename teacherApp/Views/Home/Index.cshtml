@@ -1,5 +1,4 @@
-﻿@page
-@model socialApp.Controllers.HomeController
+﻿@model List<socialApp.Models.Post>
 
 @{
     var userEmail = ViewContext.HttpContext.Session.GetString("UserEmail");
@@ -16,7 +15,7 @@
 {
     <div class="row mt-4">
         <!-- Left Side Panel for Recent News -->
-        <div class="col-md-3 bg-purple p-4 rounded-left">
+        <div class="col-md-3 sidebar p-4 rounded-left">
             <h4>Recent News</h4>
             <ul class="list-unstyled">
                 <li><a href="#">News Item 1</a></li>
@@ -26,13 +25,56 @@
         </div>
 
         <!-- Main Content -->
-        <div class="col-md-6 text-center bg-light-pink p-4">
+        <div class="col-md-6 text-center feed">
             <h5>News Feed</h5>
-            
+            <!-- Loop through the posts and display them here -->
+            <!-- Post Layout -->
+            @foreach (var post in Model)
+            {
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <p>@post.Content</p>
+
+                        <!-- Post Image -->
+                        @if (!string.IsNullOrEmpty(@post.ImageUrl))
+                        {
+                            <img src="@post.ImageUrl" class="post-image" alt="Post image" />
+                        }
+
+                        <!-- Like Button -->
+                        <button id="like-button-@post.PostId" class="btn btn-primary btn-sm" data-likes="@post.Likes" onclick="toggleLike('@post.PostId')">
+                            Like (@post.Likes)
+                        </button>
+
+                        <!-- Comments Section -->
+                        <h5>Comments</h5>
+                        @if (post.Comments != null && post.Comments.Any())
+                        {
+                            @foreach (var comment in post.Comments)
+                            {
+                                <p><strong>@comment.UserId (@comment.Timestamp.ToString("yyyy-MM-dd h:mm tt")):</strong><br /> @comment.Content</p>
+                            }
+                        }
+                        else
+                        {
+                            <p>No comments yet.</p>
+                        }
+
+                        <!-- Comment Input Section (Only one per post) -->
+                        <textarea id="comment-input-@post.PostId" class="form-control mb-2" name="comment" placeholder="Add a comment..."></textarea>
+
+                        <!-- Flexbox container to align timestamp and comment button -->
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="timestamp-text">@post.Timestamp.ToString("yyyy-MM-dd h:mm tt")</span>
+                            <button class="btn btn-secondary btn-sm" type="button" onclick="addComment('@post.PostId')">Add Comment</button>
+                        </div>
+                    </div>
+                </div>
+            }
         </div>
 
         <!-- Right Side Panel for Trending Hashtags -->
-        <div class="col-md-3 bg-purple p-4 rounded-right">
+        <div class="col-md-3 sidebar p-4 rounded-right">
             <h4>Trending Hashtags</h4>
             <ul class="list-unstyled">
                 <li><a href="#">#Trending1</a></li>
@@ -52,3 +94,5 @@ else
         <a href="/Auth/SignUp" class="btn btn-secondary">Sign Up</a>
     </div>
 }
+
+<script src="~/js/site.js"></script>
